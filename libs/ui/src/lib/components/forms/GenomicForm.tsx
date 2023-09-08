@@ -22,6 +22,7 @@ import CtimsDropdown from "../../custom-rjsf-templates/CtimsDropdown";
 import {CtimsDialogContext, CtimsDialogContextType} from "../CtimsMatchDialog";
 import { Checkbox } from 'primereact/checkbox';
 import { getCurrentOperator } from "../helpers";
+import axios from "axios";
 
 
 const RjsfForm = withTheme(PrimeTheme)
@@ -88,8 +89,33 @@ export const GenomicForm = (props: IFormProps) => {
 
   const dispatch = useDispatch()
 
+const hugo_gene_component = () => {
+  const [hugoSymbols, setHugoSymbols] = useState([]);
+    useEffect(() => {
+      async function fetchHugoSymbols() {
+        try {
+          const response = await axios.get('http://localhost:3333/api/genes') 
+          .then(function (response) {
+          const symbols = response.data;
+          setHugoSymbols(symbols);
+          hugoSymbols.push(symbols);
+          })
+        } catch (error) {
+          console.error('Error fetching symbols:', error);
+        }
+      }
+      fetchHugoSymbols();
+    }, []);
+    return hugoSymbols;
+}
+let hugoSymbols = hugo_gene_component();
+
   const genomicFormSchema = {
     'definitions': {
+      'hugo_symbol': {
+        "enumNames": hugoSymbols.slice(0,50),
+        "enum": hugoSymbols.slice(0,50)
+      },
       "variant_category": {
         "enumNames": [
           "Mutation",
@@ -279,7 +305,7 @@ export const GenomicForm = (props: IFormProps) => {
     'required': ['hugo_symbol', "variant_category"],
     'properties': {
       'hugo_symbol': {
-        'type': 'string',
+        "$ref": "#/definitions/hugo_symbol",
         'title': 'Hugo Symbol',
         "description": "Gene symbol as determined by https://www.genenames.org/",
       },
