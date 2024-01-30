@@ -109,6 +109,14 @@ model event {
 model gene {
   id           Int    @id @default(autoincrement())
   hugoSymbol   String
+  aliases      alias[]
+}
+
+model alias {
+  id       Int      @id @default(autoincrement())
+  name     String
+  geneId   Int
+  gene     gene     @relation(fields: [geneId], references: [id])
 }
 
 enum status {

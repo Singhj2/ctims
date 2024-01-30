@@ -70,10 +70,30 @@ async function saveGenes(data) {
   }
 }
 
+// async function saveAliases(data: DataItem) {
+//   try {
+//     const symbols = data.response.docs.map((x) => x.symbol);
+//     for (const symbol of symbols) {
+//       await prisma.alias.create({
+//         data: {
+//           aliasName: symbol,
+//           hugo: {
+//             connect: { gene: symbol },
+//           },
+//         },
+//       });
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     throw error;
+//   }
+// }
+
 async function fetchAPISaveGenes() {
   try {
     const data = await fetchAPI();
     await saveGenes(data);
+    // await saveAliases(data);
   } catch (error) {
     console.error(error);
     throw error;
